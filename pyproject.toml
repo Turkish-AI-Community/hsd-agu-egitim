@@ -1,0 +1,22 @@
+[project]
+name = "hsd-agu-egitim"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "catboost>=1.2.8",
+    "fastapi>=0.128.0",
+    "jupyter>=1.1.1",
+    "lightgbm>=4.6.0",
+    "matplotlib>=3.10.8",
+    "mlflow>=3.8.1",
+    "numpy>=2.2.6",
+    "optuna>=4.6.0",
+    "pandas>=2.3.3",
+    "scikit-learn>=1.7.2",
+    "seaborn>=0.13.2",
+    "shap>=0.49.1",
+    "uvicorn>=0.40.0",
+    "xgboost>=3.1.2",
+]
