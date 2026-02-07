@@ -49,9 +49,11 @@ venv.bak/
 mlruns/
 runs/
 *.log
+catboost_info/
+
 
 # Data files
-*.csv
+
 *.tsv
 *.parquet
 *.feather
