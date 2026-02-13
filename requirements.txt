@@ -1,0 +1,5 @@
+uvicorn
+fastapi==0.128.0
+pandas==2.3.3
+scikit-learn==1.7.2
+lightgbm==4.6.0
