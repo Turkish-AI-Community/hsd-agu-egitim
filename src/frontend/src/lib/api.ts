@@ -1,4 +1,6 @@
-const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:8000";
+// Production: empty string (same origin, served by FastAPI)
+// Development: localhost:8000 (separate backend server)
+const API_BASE = import.meta.env.VITE_API_BASE ?? "";
 
 export interface CreditRequest {
   age: number;
