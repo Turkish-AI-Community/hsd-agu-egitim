@@ -57,7 +57,6 @@ catboost_info/
 *.tsv
 *.parquet
 *.feather
-*.json
 *.xml
 *.xlsx
 *.xls
@@ -123,7 +122,6 @@ yarn-error.log*
 .pnp.js
 .npm
 .yarn/
-package-lock.json
 yarn.lock
 
 # React build
