@@ -11,7 +11,7 @@ Machine Learning temellerinden başlayarak MLOps pratikleri ve Generative AI ent
 
 **KrediPusula** - Kullanıcıların kredi uygunluğunu analiz eden, kişiselleştirilmiş kredi önerileri sunan ve yapay zeka destekli asistan ile 7/24 destek sağlayan akıllı kredi danışmanlık platformu.
 
-**Canli Demo:** [kredipusula.onrender.com](https://kredipusula.onrender.com)
+🌐 **Canli Demo:** [kredipusula.onrender.com](https://kredipusula.onrender.com)
 
 ## Haftalik Plan
 

@@ -5,7 +5,11 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
+    "faiss-cpu>=1.7.0",
+    "pypdf>=4.0.0",
     "catboost>=1.2.8",
+    "google-genai>=1.57.0",
+    "python-dotenv>=1.1.1",
     "fastapi>=0.128.0",
     "jupyter>=1.1.1",
     "lightgbm>=4.6.0",

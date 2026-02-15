@@ -38,7 +38,9 @@ venv.bak/
 .jupyter/
 
 # Machine Learning
+index_store/
 #*.pkl
+
 *.joblib
 *.h5
 *.hdf5
