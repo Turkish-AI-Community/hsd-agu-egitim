@@ -38,7 +38,7 @@ venv.bak/
 .jupyter/
 
 # Machine Learning
-index_store/
+notebooks/index_store/
 #*.pkl
 
 *.joblib
@@ -157,9 +157,9 @@ temp/
 *.swo
 
 # Database
-*.db
 *.sqlite
 *.sqlite3
+data/chat_history.db
 
 # Monitoring
 prometheus_data/
