@@ -11,6 +11,7 @@ class CreditRequest(BaseModel):
     credit_amount: int = Field(..., gt=0, description="Loan amount in DM")
     duration: int = Field(..., gt=0, description="Loan duration in months")
     purpose: str = Field(..., description="Loan purpose")
+    session_id: str | None = Field(None, description="Chat session id to link prediction context")
 
     model_config = {
         "json_schema_extra": {
@@ -35,3 +36,19 @@ class CreditResponse(BaseModel):
     prediction: str = Field(..., description="Risk prediction: good / bad")
     probability: float = Field(..., description="Probability of 'bad' class")
     threshold: float = Field(..., description="Decision threshold used")
+
+
+class ChatRequest(BaseModel):
+    message: str = Field(..., min_length=1, max_length=1000, description="User message")
+    session_id: str = Field(..., min_length=1, description="Chat session identifier")
+
+
+class ChatResponse(BaseModel):
+    reply: str = Field(..., description="Assistant reply")
+    session_id: str = Field(..., description="Chat session identifier")
+
+
+class ChatHistoryMessage(BaseModel):
+    role: str
+    content: str
+    timestamp: str

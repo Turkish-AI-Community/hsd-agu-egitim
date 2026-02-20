@@ -12,6 +12,7 @@ export interface CreditRequest {
   credit_amount: number;
   duration: number;
   purpose: string;
+  session_id?: string;
 }
 
 export interface CreditResponse {
@@ -44,4 +45,41 @@ export async function checkHealth(): Promise<boolean> {
   } catch {
     return false;
   }
+}
+
+export interface ChatMessage {
+  role: "user" | "model";
+  content: string;
+  timestamp?: string;
+}
+
+export interface ChatResponse {
+  reply: string;
+  session_id: string;
+}
+
+export async function sendChatMessage(
+  message: string,
+  sessionId: string
+): Promise<ChatResponse> {
+  const response = await fetch(`${API_BASE}/chat`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ message, session_id: sessionId }),
+  });
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => null);
+    throw new Error(error?.detail ?? "Mesaj gönderilemedi");
+  }
+
+  return response.json();
+}
+
+export async function getChatHistory(
+  sessionId: string
+): Promise<ChatMessage[]> {
+  const response = await fetch(`${API_BASE}/chat/history/${sessionId}`);
+  if (!response.ok) return [];
+  return response.json();
 }

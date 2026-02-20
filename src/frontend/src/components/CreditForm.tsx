@@ -1,6 +1,7 @@
 import { useState } from "react";
 import type { CreditRequest, CreditResponse } from "@/lib/api";
 import { predictCreditRisk } from "@/lib/api";
+import { getSessionId } from "@/lib/session";
 import ResultCard from "./ResultCard";
 import { Loader2, Send } from "lucide-react";
 
@@ -83,7 +84,7 @@ export default function CreditForm() {
     setResult(null);
 
     try {
-      const data = await predictCreditRisk(form);
+      const data = await predictCreditRisk({ ...form, session_id: getSessionId() });
       setResult(data);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Bir hata oluştu");
