@@ -1,5 +1,5 @@
 # KrediPusula RAG Chatbot — Soru-Cevap Dataseti
-## Toplam: ~250 Soru | 7 Kategori | Türkçe | Orta Seviye
+## Toplam: ~300 Soru | 8 Kategori | Türkçe | Orta Seviye
 
 ---
 
