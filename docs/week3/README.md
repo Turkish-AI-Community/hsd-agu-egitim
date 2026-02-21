@@ -181,13 +181,12 @@ LLM'e dışarıdan fonksiyonlar tanımlanabilir. LLM, ihtiyaç duyduğunda bu fo
 
 **Örnek:**
 ```python
-def get_risk_level(probability: float) -> str:
-    if probability < 0.33:
-        return "Yüksek Risk"
-    elif probability < 0.66:
-        return "Orta Risk"
-    else:
-        return "Düşük Risk"
+THRESHOLD = 0.30
+
+def evaluate_risk_score(probability: float) -> str:
+    if probability >= THRESHOLD:
+        return f"riskli (bad) — olasılık {probability:.2f}, eşik {THRESHOLD} üzerinde"
+    return f"güvenli (good) — olasılık {probability:.2f}, eşik {THRESHOLD} altında"
 ```
 
 ### Agentic RAG
@@ -197,10 +196,10 @@ RAG ve Agent mimarilerinin birleşimi. LLM hem:
 - İhtiyaç duyduğunda harici fonksiyonlar çağırabilir (Tool Calling).
 
 **Kredi Pusula Örneği:**
-Kullanıcı "kredi başvurum neden reddedildi?" diye sorduğunda ajan:
-1. `get_latest_prediction()` tool'unu çağırarak en güncel tahmin sonucunu alır,
-2. `get_prediction_features()` tool'unu çağırarak hangi özelliklerin skoru etkilediğini getirir,
-3. RAG ile bilgi tabanından ilgili içerikleri çeker,
+Kullanıcı "kredi başvurum neden riskli çıktı?" diye sorduğunda ajan:
+1. RAG ile bilgi tabanından (`soru_cevap_data.md`) ilgili Q&A çiftlerini bulur,
+2. SQLite'tan kullanıcının en güncel tahmin sonucunu (inputlar + probability + prediction) bağlama ekler,
+3. Gerekirse `evaluate_risk_score(probability)` tool'unu çağırarak risk değerlendirmesi yapar,
 4. Tüm bu bilgileri birleştirerek kullanıcıya açıklayıcı bir yanıt üretir.
 
 ---
@@ -212,8 +211,8 @@ Kullanıcı "kredi başvurum neden reddedildi?" diye sorduğunda ajan:
 Üretim ortamlarında sohbet geçmişi ve tahmin sonuçları kalıcı olarak saklanmalıdır.
 
 Bu projede **SQLite** kullanılmıştır. Tablolar:
-- `chat_messages`: Kullanıcı ve asistan mesajları, zaman damgası, kullanıcı ID'si
-- `predictions`: Kredi başvuru sonuçları ve feature değerleri
+- `chat_messages`: Kullanıcı ve asistan mesajları, session ID, zaman damgası
+- `prediction_context`: Kredi hesaplama sonuçları (inputlar + sonuç), session bazlı birikimli kayıt
 
 ### RAG Servisinin Backend'e Entegrasyonu
 
@@ -221,23 +220,30 @@ Notebook'ta geliştirilen RAG kodları `rag_service.py` dosyasına taşınmışt
 
 ### Sistem Instruction (Ürün İçin)
 ```
-Sen "Kredi Pusula" uygulamasının samimi ve yardımsever yapay zeka asistanısın.
-Adın: Kredi Pusula Asistan.
-Görevin: Kullanıcılara kredi başvuru süreci, kredi skorlama ve uygulama 
-hakkında yardımcı olmak.
-Elindeki araçları (evaluate_risk_score) gerektiğinde kullan.
-Bilmediğin bir konuda "bilmiyorum" de, asla uydurma.
+Sen KrediPusula uygulamasının samimi ve yardımcı asistanısın. Adın KrediPusula Asistan.
+
+Görevin:
+- Kredi risk skorlama hakkında soruları yanıtlamak
+- Kullanıcılara başvuru süreci ve uygulama hakkında yardımcı olmak
+- Samimi, sıcak ve anlaşılır bir dil kullanmak
+
+Uygulama bilgileri:
+- LightGBM tabanlı kredi risk değerlendirme, eşik: 0.30
+- probability >= 0.30 → "riskli" (bad), probability < 0.30 → "güvenli" (good)
+
+Tool: evaluate_risk_score(probability) - risk değerlendirmesi
+Bilmediğin konuda samimi şekilde belirt, asla uydurma.
 ```
 
 ### Kullanılan Araçlar ve Kütüphaneler
 
 | Araç | Kullanım Amacı |
 |---|---|
-| `google-generativeai` | Gemini API SDK |
-| `FAISS` | Vektör veritabanı |
+| `google-genai` | Gemini API SDK (embedding + generation + tool calling) |
+| `FAISS` | Vektör veritabanı (IndexFlatIP, cosine similarity) |
 | `python-dotenv` | API anahtarını environment'tan okuma |
-| `SQLite` | Sohbet geçmişi ve tahmin saklama |
-| `Gradio` | Hızlı notebook arayüzü prototipi |
+| `SQLite` | Sohbet geçmişi ve tahmin bağlamı saklama |
+| `react-markdown` | Frontend'de chatbot yanıtlarını markdown olarak render etme |
 
 ---
 

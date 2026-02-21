@@ -1,12 +1,26 @@
 # Credit Risk Prediction API
 
-LightGBM modeli ile kredi riski tahmini yapan FastAPI servisi.
+LightGBM modeli ile kredi riski tahmini yapan ve RAG tabanlı chatbot asistan barındıran FastAPI servisi.
+
+## Dosya Yapısı
+
+| Dosya | Açıklama |
+|-------|----------|
+| `main.py` | FastAPI uygulaması, endpoint tanımları, CORS, statik dosya servisi |
+| `model.py` | LightGBM pipeline yükleme ve tahmin |
+| `schemas.py` | Pydantic request/response şemaları |
+| `feature_eng.py` | Feature engineering (inference sırasında pipeline öncesi) |
+| `rag_service.py` | RAG chatbot servisi: FAISS index, Gemini embedding/generation, tool calling |
+| `database.py` | SQLite ile sohbet geçmişi ve tahmin bağlamı yönetimi |
 
 ## Çalıştırma
 
 Proje kök dizininde:
 
 ```bash
+# Gemini API anahtarını .env dosyasına ekle (chatbot için gerekli)
+# GEMINI_API_KEY=your-api-key
+
 uv run uvicorn src.backend.main:app --reload
 ```
 
@@ -76,6 +90,36 @@ Yanıt:
 }
 ```
 
+### POST /chat
+
+Chatbot asistanına mesaj gönderir. RAG ile bilgi tabanından bağlam çeker, varsa en güncel kredi hesaplama sonucunu da kullanır.
+
+```bash
+curl -X POST http://127.0.0.1:8000/chat \
+  -H "Content-Type: application/json" \
+  -d '{
+    "message": "Kredi skorum neden riskli çıktı?",
+    "session_id": "test-session-123"
+  }'
+```
+
+Yanıt:
+
+```json
+{
+  "reply": "Merhaba! Hesaplama sonucuna baktığımda...",
+  "session_id": "test-session-123"
+}
+```
+
+### GET /chat/history/{session_id}
+
+Belirli bir oturumun sohbet geçmişini döndürür.
+
+```bash
+curl http://127.0.0.1:8000/chat/history/test-session-123
+```
+
 ### Swagger UI
 
 Tarayıcıda interaktif API dokümantasyonu:
@@ -84,7 +128,7 @@ Tarayıcıda interaktif API dokümantasyonu:
 http://127.0.0.1:8000/docs
 ```
 
-## Request Alanları
+## Request Alanları (POST /predict)
 
 | Alan | Tip | Açıklama |
 |------|-----|----------|
@@ -98,10 +142,17 @@ http://127.0.0.1:8000/docs
 | duration | int | Kredi süresi, ay (>0) |
 | purpose | str | Kredi amacı: car, furniture/equipment, radio/TV, domestic appliances, repairs, education, business, vacation/others |
 
-## Response Alanları
+## Response Alanları (POST /predict)
 
 | Alan | Tip | Açıklama |
 |------|-----|----------|
 | prediction | str | Tahmin: "good" veya "bad" |
 | probability | float | "bad" sınıfı olasılığı (0-1) |
 | threshold | float | Karar eşiği (0.30) |
+
+## Ortam Değişkenleri
+
+| Değişken | Açıklama | Zorunlu |
+|----------|----------|---------|
+| `GEMINI_API_KEY` | Gemini API anahtarı (chatbot için) | Chatbot kullanılacaksa evet |
+| `ALLOWED_ORIGINS` | CORS izinli originler (virgülle ayrılmış) | Hayır (varsayılan: localhost) |

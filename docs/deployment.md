@@ -8,10 +8,19 @@ Bu dokuman KrediPusula uygulamasinin lokal gelistirme, sadece backend ve Render 
 - Node.js >= 18
 - npm >= 9
 - uv (local gelistirme icin, opsiyonel)
+- Gemini API anahtari (chatbot icin, https://aistudio.google.com/ adresinden alinabilir)
 
 ## 1. Lokal Gelistirme
 
 Lokal ortamda backend ve frontend ayri sunucularda calisir.
+
+### Ortam Degiskenleri
+
+Proje kok dizininde `.env` dosyasi olusturun:
+
+```
+GEMINI_API_KEY=your-gemini-api-key
+```
 
 ### Backend (port 8000)
 
@@ -78,8 +87,12 @@ src/
     model.py              # Model yukleme ve tahmin
     schemas.py            # Pydantic sema tanimlari
     feature_eng.py        # Feature engineering
+    rag_service.py        # RAG chatbot servisi
+    database.py           # SQLite veritabani yonetimi
 models/
   lightgbm_tuned_pipeline.pkl   # Egitilmis model
+data/
+  soru_cevap_data.md      # Chatbot bilgi tabani
 ```
 
 ### Ortam Degiskenleri
@@ -87,6 +100,7 @@ models/
 | Degisken | Aciklama | Varsayilan |
 |----------|----------|------------|
 | `PORT` | Sunucu portu | 8000 |
+| `GEMINI_API_KEY` | Gemini API anahtari (chatbot icin) | - |
 | `ALLOWED_ORIGINS` | CORS izinli originler (virgul ile ayrilmis) | `http://localhost:5173,http://127.0.0.1:5173` |
 
 ### Calistirma
@@ -116,17 +130,22 @@ Tek bir Render Web Service uzerinde hem backend hem frontend birlikte calisir. F
 | Key | Value |
 |-----|-------|
 | `PYTHON_VERSION` | `3.12` |
+| `GEMINI_API_KEY` | Gemini API anahtariniz |
 
 > **Not:** Tek serviste frontend ve backend ayni origin'de calistigi icin `ALLOWED_ORIGINS` ve `VITE_API_BASE` tanimlamaya gerek yoktur. Frontend build sirasinda `VITE_API_BASE` tanimli olmadigindan API istekleri otomatik olarak ayni origin'e gider.
 
 ### Nasil Calisiyor?
 
 1. **Build asamasi:** Render once Python bagimliklarini yukler, sonra frontend'i (`npm install && npm run build`) derler. Build ciktisi `src/frontend/dist/` klasorune olusur.
-2. **Calisma asamasi:** Uvicorn, FastAPI uygulamasini baslatir. FastAPI:
-   - `/health` ve `/predict` endpointlerini API olarak sunar
+2. **Calisma asamasi:** Uvicorn, FastAPI uygulamasini baslatir. Startup sirasinda:
+   - LightGBM modeli yuklenir
+   - SQLite veritabani baslatilir
+   - FAISS index olusturulur/yuklenir (ilk sefer Gemini Embedding API kullanilir)
+3. FastAPI:
+   - `/health`, `/predict` ve `/chat` endpointlerini API olarak sunar
    - `src/frontend/dist/` klasorundeki statik dosyalari (JS, CSS, gorseller) sunar
    - Diger tum route'lari `index.html`'e yonlendirir (SPA fallback)
-3. Sonuc olarak `https://kredipusula.onrender.com` adresinde hem site hem API tek servisten calisir.
+4. Sonuc olarak `https://kredipusula.onrender.com` adresinde hem site hem API tek servisten calisir.
 
 
 ### Deploy Sonrasi Test
@@ -139,4 +158,9 @@ curl https://kredipusula.onrender.com/health
 curl -X POST https://kredipusula.onrender.com/predict \
   -H "Content-Type: application/json" \
   -d '{"age":35,"sex":"male","job":2,"housing":"own","saving_accounts":"little","checking_account":"moderate","credit_amount":5000,"duration":24,"purpose":"car"}'
+
+# Chatbot
+curl -X POST https://kredipusula.onrender.com/chat \
+  -H "Content-Type: application/json" \
+  -d '{"message":"Kredi riski nasıl hesaplanıyor?","session_id":"test-123"}'
 ```

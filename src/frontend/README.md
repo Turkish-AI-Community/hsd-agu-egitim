@@ -1,6 +1,6 @@
 # KrediPusula - Kredi Risk Tahmin Uygulaması (Frontend)
 
-Makine öğrenmesi modeli ile kredi başvurularının risk değerlendirmesini yapan React tabanlı web uygulaması.
+Makine öğrenmesi modeli ile kredi başvurularının risk değerlendirmesini yapan ve RAG tabanlı AI asistan barındıran React web uygulaması.
 
 ## Tech Stack
 
@@ -9,6 +9,7 @@ Makine öğrenmesi modeli ile kredi başvurularının risk değerlendirmesini ya
 - **Tailwind CSS v4** (styling)
 - **React Router** (sayfa yönlendirme)
 - **Lucide React** (ikonlar)
+- **react-markdown** (chatbot yanıtlarında markdown render)
 
 ## Gereksinimler
 
@@ -71,13 +72,15 @@ src/frontend/
       CreditForm.tsx
       ResultCard.tsx
       Calculator.tsx
+      ChatWidget.tsx  # AI asistan chatbot (sağ alt köşe)
     pages/         # Sayfa bileşenleri
       HomePage.tsx
       ApplyPage.tsx
       CalculatorPage.tsx
       InfoPage.tsx
     lib/           # Yardımcı fonksiyonlar
-      api.ts       # Backend API çağrıları
+      api.ts       # Backend API çağrıları (predict + chat)
+      session.ts   # Session ID yönetimi (localStorage)
       utils.ts     # Tailwind class birleştirme
     App.tsx        # Router tanımları
     main.tsx       # Uygulama giriş noktası
@@ -93,9 +96,21 @@ npm run preview   # Build sonucunu önizle
 
 Build çıktısı `dist/` klasörüne oluşturulur.
 
+## Chatbot (AI Asistan)
+
+Sağ alt köşedeki chatbot butonu ile KrediPusula Asistanına erişilebilir. Asistan:
+
+- Kredi risk skorlama ve başvuru süreci hakkında sorulara yanıt verir
+- Kullanıcının en son yaptığı kredi hesaplama sonucunu otomatik olarak bağlamına alır
+- Markdown formatında yanıtlar üretir
+- Sohbet geçmişi session bazlı saklanır
+
+Chatbot'un çalışması için backend'de `GEMINI_API_KEY` ortam değişkeni tanımlı olmalıdır.
+
 ## Notlar
 
 - Frontend, backend API'ye `http://localhost:8000` üzerinden bağlanır
 - Backend'de CORS middleware aktif olmalıdır (varsayılan olarak eklenmiştir)
 - Hesaplayıcı sayfası tamamen client-side çalışır, backend bağlantısı gerektirmez
+- Chatbot, session ID ile çalışır; aynı tarayıcıda form ve chat aynı oturumu paylaşır
 - Bu uygulama eğitim amaçlıdır, gerçek finansal kararlar için kullanılmamalıdır

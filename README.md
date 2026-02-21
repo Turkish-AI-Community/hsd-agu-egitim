@@ -25,9 +25,9 @@ Machine Learning temellerinden başlayarak MLOps pratikleri ve Generative AI ent
 |----------|-------------|
 | **Data & ML** | NumPy, Pandas, Matplotlib, Seaborn, scikit-learn, XGBoost, LightGBM, CatBoost |
 | **Tuning & Tracking** | Optuna, MLflow |
-| **Backend** | FastAPI, Uvicorn |
+| **Backend** | FastAPI, Uvicorn, SQLite |
 | **Frontend** | React, TypeScript, Tailwind CSS, Vite |
-| **LLM** | Google GenAI SDK (Gemini) |
+| **GenAI & RAG** | Google GenAI SDK (Gemini), FAISS, Gemini Embedding |
 | **Deployment** | Render.com |
 
 ## Repository Yapisi
@@ -35,12 +35,18 @@ Machine Learning temellerinden başlayarak MLOps pratikleri ve Generative AI ent
 ```
 hsd_agu_egitim/
 ├── data/
-│   └── german_credit_data.csv        # German Credit Risk veri seti
+│   ├── german_credit_data.csv        # German Credit Risk veri seti
+│   ├── soru_cevap_data.md            # Chatbot Q&A bilgi tabani (250 soru-cevap)
+│   └── index_store/                  # FAISS index ve dokuman cache
+│       ├── faiss_index.bin           # Vektor indeksi
+│       └── documents.pkl             # Dokuman listesi
 │
 ├── notebooks/
 │   ├── 01_eda.ipynb                  # Kesifci veri analizi
 │   ├── 02_baseline.ipynb             # Baseline model egitimi ve karsilastirma
-│   └── 03_feature_engineering.ipynb  # FE, tuning, threshold optimizasyonu
+│   ├── 03_feature_engineering.ipynb  # FE, tuning, threshold optimizasyonu
+│   ├── GenAI_Fundamentals.ipynb      # GenAI temelleri egitim notebooku
+│   └── GenAI_RAG_Agent_Concepts.ipynb # RAG & Agent kavramlari egitim notebooku
 │
 ├── models/
 │   └── lightgbm_tuned_pipeline.pkl   # Egitilmis LightGBM pipeline
@@ -51,13 +57,15 @@ hsd_agu_egitim/
 │   │   ├── model.py                  # Model yukleme ve tahmin
 │   │   ├── schemas.py                # Pydantic veri semalari
 │   │   ├── feature_eng.py            # Feature engineering (inference)
+│   │   ├── rag_service.py            # RAG + Agent chatbot servisi (FAISS, Gemini)
+│   │   ├── database.py               # SQLite: sohbet gecmisi ve tahmin kayitlari
 │   │   └── README.md                 # Backend dokumantasyonu
 │   │
 │   └── frontend/                     # React + TypeScript web uygulamasi
 │       ├── src/
-│       │   ├── components/           # Navbar, Footer, CreditForm, ResultCard, Calculator
+│       │   ├── components/           # Navbar, Footer, CreditForm, ResultCard, Calculator, ChatWidget
 │       │   ├── pages/                # HomePage, ApplyPage, CalculatorPage, InfoPage
-│       │   └── lib/                  # API katmani, yardimci fonksiyonlar
+│       │   └── lib/                  # API katmani, session yonetimi, yardimci fonksiyonlar
 │       ├── package.json
 │       └── README.md                 # Frontend dokumantasyonu
 │
@@ -82,10 +90,14 @@ cd hsd-agu-egitim
 # 2. Python bagimliklarini yukle
 uv sync
 
-# 3. Backend'i baslat
+# 3. Gemini API anahtarini ayarla (chatbot icin gerekli)
+#    .env dosyasina GEMINI_API_KEY=... ekle
+#    Anahtar: https://aistudio.google.com/ adresinden alinabilir
+
+# 4. Backend'i baslat
 uv run uvicorn src.backend.main:app --reload
 
-# 4. Frontend'i baslat (ayri terminal)
+# 5. Frontend'i baslat (ayri terminal)
 cd src/frontend
 npm install
 npm run dev
