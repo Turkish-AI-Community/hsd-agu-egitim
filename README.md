@@ -15,9 +15,9 @@ Machine Learning temellerinden başlayarak MLOps pratikleri ve Generative AI ent
 
 ## Haftalik Plan
 
-- **Hafta 1:** AI/Ml Temelleri - Kredi risk tahmin modeli
-- **Hafta 2:** MLOps - REST API, deployment ve monitoring 
-- **Hafta 3:** GenAI Temelleri - Generative temelli müşteri destek botu
+- **Hafta 1:** AI/ML Temelleri - Kredi risk tahmin modeli — [Yayın Kaydı](https://www.youtube.com/watch?v=fmKJBPXAHHE)
+- **Hafta 2:** MLOps - REST API, deployment ve monitoring — [Yayın Kaydı Part 1](https://www.youtube.com/watch?v=7pguTTnKEl4) | [Part 2](https://www.youtube.com/watch?v=apHaR3sWJ1M)
+- **Hafta 3:** GenAI Temelleri - Generative temelli musteri destek botu — [Yayın Kaydı](https://www.youtube.com/watch?v=phqTz1Xvyzs)
 
 ### Tech Stack
 
